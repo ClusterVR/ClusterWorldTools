@@ -1,0 +1,43 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!78 &1
+TagManager:
+  serializedVersion: 2
+  tags: []
+  layers:
+  - Default
+  - TransparentFX
+  - Ignore Raycast
+  - 
+  - Water
+  - UI
+  - Accessory
+  - AccessoryPreview
+  - 
+  - FIRSTPERSON_ONLY_LAYER
+  - THIRDPERSON_ONLY_LAYER
+  - RidingItem
+  - 
+  - 
+  - InteractableItem
+  - OtherAvatar
+  - OwnAvatar
+  - 
+  - GrabbingItem
+  - VenueLayer0
+  - VenueLayer1
+  - PostProcessing
+  - PerformerOnly
+  - Performer
+  - Audience
+  - 
+  - 
+  - 
+  - 
+  - VenueLayer2
+  - 
+  - 
+  m_SortingLayers:
+  - name: Default
+    uniqueID: 0
+    locked: 0
