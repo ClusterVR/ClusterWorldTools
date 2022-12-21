@@ -10,7 +10,7 @@ using ClusterVR.CreatorKit.Item;
 using System.Linq;
 using UnityEngine.SceneManagement;
 
-namespace ClusterCreatorCommunity
+namespace ClusterWorldTools
 {
     public class StateMonitor : EditorWindow
     {
@@ -85,7 +85,7 @@ namespace ClusterCreatorCommunity
                     var stateName = arr[1];
                     if (searchItem != null) continue;
                     if (searchText != "" && !stateName.Contains(searchText)) continue;
-                    GUILayout.Label("[Global] " + stateName + ": " + pair.Value.ToDouble().ToString(), style);
+                    GUILayout.Label($"[Global] {stateName}: {pair.Value.ToDouble().ToString()}", style);
                 }
                 else if (stateType == "_i")
                 {
@@ -100,15 +100,15 @@ namespace ClusterCreatorCommunity
                         IItem _searchItem = searchItem.GetComponent<IItem>();
                         if (_searchItem != null && !_searchItem.Id.Equals(item.Id)) continue;
                     }
-                    GUILayout.Label(item.gameObject.name + "(" + item.ItemName + ")", style);
-                    GUILayout.Label("[Item] " + stateName + ": " + pair.Value.ToDouble().ToString(), style);
+                    GUILayout.Label($"{item.gameObject.name} ({item.ItemName})", style);
+                    GUILayout.Label($"[Item] {stateName}: {pair.Value.ToDouble().ToString()}", style);
                 }
                 else if (stateType == "_p")
                 {
                     var stateName = arr[1];
                     if (searchItem != null) continue;
                     if (searchText != "" && !stateName.Contains(searchText)) continue;
-                    GUILayout.Label("[Player] " + stateName + ": " + pair.Value.ToDouble().ToString(), style);
+                    GUILayout.Label($"[Player] {stateName}: {pair.Value.ToDouble().ToString()}", style);
                 }
             }
         }

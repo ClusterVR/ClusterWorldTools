@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEditor;
 
-namespace ClusterCreatorCommunity
+namespace ClusterWorldTools
 {
 
     public class WebTriggerGeneratorQuick: WebTriggerGenerator
@@ -74,7 +74,7 @@ namespace ClusterCreatorCommunity
                     var gimmickKey = keys[i];
                     using (var horizontalScope = new GUILayout.HorizontalScope())
                     {
-                        EditorGUILayout.LabelField(gimmickKey.type.ToString() + ": " + gimmickKey.itemName + "/" + gimmickKey.key);
+                        EditorGUILayout.LabelField($"{gimmickKey.type.ToString()}: {gimmickKey.itemName}/{gimmickKey.key}");
                         gimmickKey.use = EditorGUILayout.Toggle(gimmickKey.use);
                     }
                 }

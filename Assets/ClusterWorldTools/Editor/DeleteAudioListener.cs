@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
-namespace ClusterCreatorCommunity
+namespace ClusterWorldTools
 {
     class DeleteAudioListener : MonoBehaviour
     {

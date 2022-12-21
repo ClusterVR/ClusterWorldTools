@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEditor;
 
-namespace ClusterCreatorCommunity
+namespace ClusterWorldTools
 {
     public static class ClusterTextureImportSettings
     {

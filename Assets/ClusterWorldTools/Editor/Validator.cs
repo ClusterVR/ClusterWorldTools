@@ -4,8 +4,9 @@ using UnityEngine;
 using UnityEditor;
 using ClusterVR.CreatorKit.World.Implements.MainScreenViews;
 using System.Linq;
+using System.Reflection;
 
-namespace ClusterCreatorCommunity
+namespace ClusterWorldTools
 {
     public class Validator : EditorWindow
     {
@@ -84,6 +85,8 @@ namespace ClusterCreatorCommunity
             result &= ValidateBuildTarget();
             result &= ValidateRequiredComponents();
             result &= ValidateColorSpace();
+            result &= ValidateAvatarLights();
+            result &= ValidateParticleStopAction();
 
             List<Message> messages_remove = new List<Message>();
             foreach (var msg in messages)
@@ -104,14 +107,30 @@ namespace ClusterCreatorCommunity
             }
             foreach (var msg in messages_remove) messages.Remove(msg);
 
+            if(result == false)GetWindow(Assembly.Load("UnityEditor").GetType("UnityEditor.ConsoleWindow"), false, "Console", false).Focus();
+
             return result;
+        }
+
+        delegate bool queryFunc<T>(T x);
+
+        private List<T> FindGameObjectsAndPrefabs<T>(queryFunc<T> func) where T : Object
+        {
+            var gameObjects = FindObjectsOfType<T>(true).Where(x => func(x));
+            var prefabs = AssetDatabase.FindAssets("t:GameObject", null).Select(path => AssetDatabase.LoadAssetAtPath<T>(AssetDatabase.GUIDToAssetPath(path))).Where(prefab => prefab != null && func(prefab));
+
+            var ret = new List<T>();
+            ret.AddRange(gameObjects);
+            ret.AddRange(prefabs);
+
+            return ret;
         }
 
         private bool ValidateUnityVersion()
         {
             if (Application.unityVersion != CLUSTER_UNITY_VERSION)
             {
-                messages.Add(new Message(Message.Type.error, "Unityバージョンは" + CLUSTER_UNITY_VERSION + "を使用してください。", "https://docs.cluster.mu/creatorkit/installation/install-unity/"));
+                messages.Add(new Message(Message.Type.error, $"Unityバージョンは{CLUSTER_UNITY_VERSION}を使用してください。", "https://docs.cluster.mu/creatorkit/installation/install-unity/"));
                 return false;
             }
             else return true;
@@ -154,7 +173,7 @@ namespace ClusterCreatorCommunity
             {
                 foreach (var light in realtimeLights)
                 {
-                    messages.Add(new Message(Message.Type.warning, "RealtimeまたはMixedライトは同時に2つまでしか正確に反映されません。ライトを削除、またはベイクしてください。"
+                    messages.Add(new Message(Message.Type.warning, "RealtimeまたはMixedライトは同時に2つまでしか正確に反映されません。ライトベイクを推奨します。"
                         , "https://docs.cluster.mu/creatorkit/world/lighting-world/", light));
                 }
                 return false;
@@ -204,38 +223,26 @@ namespace ClusterCreatorCommunity
                 }
             }
 #endif
-
             return result;
         }
 
         private bool ValidateCollideGimmicks()
         {
-            bool result = true;
-
-            var onCollideItemTrigger = FindObjectsOfType<ClusterVR.CreatorKit.Trigger.Implements.OnCollideItemTrigger>(true);
-            foreach (var obj in onCollideItemTrigger)
+            // 他のコライダとの接触検知には自身にコライダor自身にRigidbodyが付いたうえで子にコライダが必要
+            var invalidOnCollideItemTriggers = FindGameObjectsAndPrefabs<ClusterVR.CreatorKit.Trigger.Implements.OnCollideItemTrigger>(trigger => trigger.GetComponent<Collider>() == null && (trigger.GetComponent<Rigidbody>() == null || trigger.GetComponentInChildren<Collider>(true) == null));
+            foreach (var trigger in invalidOnCollideItemTriggers)
             {
-                // 他のコライダとの接触検知には自身にコライダor自身にRigidbodyが付いたうえで子にコライダが必要
-                if (obj.GetComponent<Collider>() == null
-                    && (obj.GetComponent<Rigidbody>() == null || obj.GetComponentInChildren<Collider>(true) == null))
-                {
-                    result = false;
-                    messages.Add(new Message(Message.Type.warning, "On Collide Item Triggerにはコライダーが必要です。子オブジェクトのコライダーを適用するにはRigidbodyを追加してください。", "", obj));
-                }
+                messages.Add(new Message(Message.Type.warning, "On Collide Item Triggerにはコライダーが必要です。子オブジェクトのコライダーを適用するにはRigidbodyを追加してください。", "", trigger));
             }
 
-            var contactableItems = FindObjectsOfType<ClusterVR.CreatorKit.Item.Implements.ContactableItem>(true);
-            foreach (var obj in contactableItems)
+            // クリック場所の判定には単純に自身or子にコライダがあればいい
+            var invalidContactableItems = FindGameObjectsAndPrefabs<ClusterVR.CreatorKit.Item.Implements.ContactableItem>(item => item.GetComponentInChildren<Collider>(true) == null);
+            foreach (var item in invalidContactableItems)
             {
-                // クリック場所の判定には単純に自身or子にコライダがあればいい
-                if (obj.GetComponentInChildren<Collider>(true) == null)
-                {
-                    result = false;
-                    messages.Add(new Message(Message.Type.warning, "アイテムをクリックするためにはコライダーが必要です。", "", obj));
-                }
+                messages.Add(new Message(Message.Type.warning, "アイテムをクリックするためにはコライダーが必要です。", "", item));
             }
 
-            return result;
+            return invalidOnCollideItemTriggers.Count == 0 && invalidContactableItems.Count == 0;
         }
 
         private bool ValidateScreenShader()
@@ -320,6 +327,66 @@ namespace ClusterCreatorCommunity
         {
             PlayerSettings.colorSpace = ColorSpace.Linear;
             Debug.Log("Color Spaceを修正しました");
+        }
+
+        private bool ValidateAvatarLights()
+        {
+            string[] avatarLayers =
+            {
+                LayerMask.LayerToName(6),  //Accessory
+                LayerMask.LayerToName(7),  //AccessoryPreview
+                LayerMask.LayerToName(16), //OwnAvatar
+                LayerMask.LayerToName(23), //Performer
+                LayerMask.LayerToName(24)  //Audience
+            };
+            var allAvatarLayerMask = LayerMask.GetMask(avatarLayers);
+
+            var invalidAvatarLights = FindObjectsOfType<Light>(true).Where(light =>
+            {
+                var avatarLayerMask = light.cullingMask & allAvatarLayerMask;
+                return !((avatarLayerMask == allAvatarLayerMask) || (avatarLayerMask == 0));
+            }).ToArray();
+
+            foreach (var invalidAvatarLight in invalidAvatarLights)
+            {
+                messages.Add(new Message(Message.Type.warning, "アバター関連レイヤーの一部にライトが当たらない設定になっています。", FixAvatarLights, invalidAvatarLight));
+            }
+
+            return invalidAvatarLights.Length == 0;
+        }
+
+        void FixAvatarLights()
+        {
+            string[] avatarLayers =
+            {
+                LayerMask.LayerToName(6),  //Accessory
+                LayerMask.LayerToName(7),  //AccessoryPreview
+                LayerMask.LayerToName(16), //OwnAvatar
+                LayerMask.LayerToName(23), //Performer
+                LayerMask.LayerToName(24)  //Audience
+            };
+            var allAvatarLayerMask = LayerMask.GetMask(avatarLayers);
+
+            var avatarLights = FindObjectsOfType<Light>(true).Where(light =>
+            {
+                return (light.cullingMask & allAvatarLayerMask) != 0;
+            });
+
+            foreach (var light in avatarLights)
+            {
+                light.cullingMask = light.cullingMask | allAvatarLayerMask;
+            }
+        }
+
+        private bool ValidateParticleStopAction()
+        {
+            var invalidParticles = FindGameObjectsAndPrefabs<ParticleSystem>(particle => particle.GetComponentInChildren<ClusterVR.CreatorKit.Item.Implements.Item>() != null && particle.main.stopAction == ParticleSystemStopAction.Destroy);
+            foreach (var particle in invalidParticles)
+            {
+                messages.Add(new Message(Message.Type.warning, "ItemをParticle SystemのStop ActionでDestroyすることは非推奨です。Destroy Item Gimmickを利用してください。", "", particle));
+            }
+
+            return invalidParticles.Count == 0;
         }
     }
 }

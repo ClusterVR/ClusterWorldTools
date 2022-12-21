@@ -6,7 +6,7 @@ using UnityEditorInternal;
 using System;
 using System.IO;
 
-namespace ClusterCreatorCommunity
+namespace ClusterWorldTools
 {
     public class WebTriggerGenerator : EditorWindow
     {
@@ -234,7 +234,7 @@ namespace ClusterCreatorCommunity
                     reorderableList.drawElementCallback += (rect, index, isActive, isFocused) =>
                     {
                         var t = triggerList.triggers[index];
-                        EditorGUI.LabelField(rect, t.category + "/" + t.displayName);
+                        EditorGUI.LabelField(rect, $"{t.category}/{t.displayName}");
                         rect.x = rect.x + rect.width - 64;
                         rect.width = 64;
                         if(GUI.Button(rect, "編集"))
@@ -317,7 +317,7 @@ namespace ClusterCreatorCommunity
 
         protected void SaveJson()
         {
-            jsonFilePath = EditorUtility.SaveFilePanel("", "Assets", "WebTrigger_" + SceneManager.GetActiveScene().name, "json");
+            jsonFilePath = EditorUtility.SaveFilePanel("", "Assets", $"WebTrigger_{SceneManager.GetActiveScene().name}", "json");
             if (jsonFilePath == string.Empty) return;
 
             string json = "{\"triggers\":[";
