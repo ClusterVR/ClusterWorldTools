@@ -1,0 +1,12 @@
+{
+  "name": "mu.cluster.cluster-world-tools",
+  "author": "Cluster, Inc.",
+  "version": "1.2.0",
+  "displayName": "Cluster World Tools",
+  "description": "Cluster World Tools",
+  "unity": "2021.3",
+  "dependencies": {
+    "mu.cluster.cluster-creator-kit": "",
+    "com.unity.postprocessing": ""
+  }
+}
