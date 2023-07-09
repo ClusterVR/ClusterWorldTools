@@ -6,7 +6,7 @@
   "description": "Cluster World Tools",
   "unity": "2021.3",
   "dependencies": {
-    "mu.cluster.cluster-creator-kit": "",
-    "com.unity.postprocessing": ""
+    "mu.cluster.cluster-creator-kit": "2.3.1",
+    "com.unity.postprocessing": "3.2.2"
   }
 }
