@@ -19,7 +19,7 @@ ReleasesからLatestを選択し、ClusterWorldTools.unitypackageをダウンロ
 ## 使い方（メニュー機能）
 上部メニュー「WorldTools」から利用できる機能です。
 
-![image](https://github.com/ClusterVR/ClusterWorldTools_Internal/assets/64951202/bbb835aa-1c54-46fe-bd0b-1cc347cf77bc)
+![image](Images/Menu.png)
 
 ### Webトリガー生成（かんたん）
 シーン内のギミックコンポーネントからbool型とsignal型のKeyの一覧を表示し、選択してWebトリガー用のJSONファイルを書き出すことができます。
@@ -28,7 +28,7 @@ ReleasesからLatestを選択し、ClusterWorldTools.unitypackageをダウンロ
 
 イベントでの利用のほか、デバッグ時に簡易的にギミックを動かす場合などにもオススメです。
 
-![WebTrigger_Quick](https://github.com/ClusterVR/ClusterWorldTools_Internal/assets/64951202/f2e451a7-6414-4b78-abeb-21869bb4e4f6)
+![WebTrigger_Quick](Images/WebTriggerGeneratorQuick.png)
 
 ### Webトリガー生成（詳細）
 詳細な設定をしてWebトリガーを生成しJSONに書き出すことができます。
@@ -39,7 +39,7 @@ ReleasesからLatestを選択し、ClusterWorldTools.unitypackageをダウンロ
 こちらは設定できる項目が多く、複雑なWebトリガーを作成できます。
 Webトリガーの詳細は[Cluster Creator Kit公式ドキュメント](https://docs.cluster.mu/creatorkit/event/web-trigger/)を参照してください。
 
-![WebTrigger](https://github.com/ClusterVR/ClusterWorldTools_Internal/assets/64951202/3b672e95-5239-416b-a440-8533ffda54ea)
+![WebTrigger](Images/WebTriggerGenerator.png)
 
 ### レイヤー自動設定
 clusterのワールドに利用できるレイヤーを自動で設定します。
@@ -50,7 +50,7 @@ clusterのワールドに利用できるレイヤーを自動で設定します�
 Integer型やFloat型は値がそのまま、Bool型は0か1で表示されます。
 Signal型は変更されたときに緑色に光ります。
 
-![TriggerMonitor](https://github.com/ClusterVR/ClusterWorldTools_Internal/assets/64951202/e66c64a1-3db0-43a1-ba18-8beff356747c)
+![TriggerMonitor](Images/StateMonitor.png)
 
 ### テクスチャインポート設定
 テクスチャインポート時にサイズ上限とモバイルでの圧縮形式を自動で設定し、一括で軽量化することができます。
@@ -62,7 +62,7 @@ PC・モバイル別のサイズ上限と、モバイルでの圧縮品質を選
 
 ※この設定は全てのプロジェクトで共有されます。有効になっていると、他のプロジェクトに導入したときは始めから有効になります。
 
-![TextureImport](https://github.com/ClusterVR/ClusterWorldTools_Internal/assets/64951202/023474ae-4120-4b93-8ea8-f4bcfba63ad7)
+![TextureImport](Images/TextureImporter.png)
 
 ### 改善チェック
 よくある不具合・エラーの原因をチェックしてConsoleに表示します。 一部は自動修正することができます。
@@ -71,21 +71,21 @@ Console上のエラーや警告をクリックすると、不備のあるオブ�
 
 それぞれのチェック項目は個別に有効・無効を選択することができます。
 
-![Validator](https://github.com/ClusterVR/ClusterWorldTools_Internal/assets/64951202/e171fda3-2b20-4a51-9d14-180a1ff9fa00)
+![Validator](Images/Validator.png)
 
 ### Key検索
 条件を指定して、シーン上で使われているKeyを検索します。
 
 表示されたKeyをクリックするとそのオブジェクトが選択され、また同じ条件のKeyを再検索することができます。
 
-![KeySearch](https://github.com/ClusterVR/ClusterWorldTools_Internal/assets/64951202/437f75fe-e082-42a6-8da3-09eaa65ef488)
+![KeySearch](Images/KeySearch.png)
 
 ### クラフトアイテムプレビュー
 PrefabやGameObjectを指定して、ワールドクラフトに設置した際の見た目をシミュレーションすることができます。
 
 ワールドクラフトの「ワールド環境>エフェクト」で設定できる「光の強さ」「カラーフィルタ」が適用された見た目を確認することができます。
 
-![ItemPreview](https://github.com/ClusterVR/ClusterWorldTools_Internal/assets/64951202/5fd8e827-727d-4101-a3f2-250c554692fa)
+![ItemPreview](Images/KeySearch.png)
 
 ## 使い方（その他の機能）
 
