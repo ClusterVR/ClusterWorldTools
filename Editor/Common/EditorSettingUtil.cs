@@ -5,26 +5,11 @@ using System.IO;
 using UnityEditor;
 using UnityEngine;
 
-namespace ClusterWorldTools
+namespace ClusterWorldTools.Editor.Common
 {
-    public class Common
+    public class EditorSettingUtil
     {
-        const string ASSET_DIRECTORY_LOCAL = "Assets/ClusterWorldTools";
-        const string ASSET_DIRECTORY_PACKAGE = "Packages/mu.cluster.cluster-world-tools";
-
         const string SETTINGS_KEY_PREFIX = "ClusterWorldToolsSettings/";
-
-
-        public static string AssetPath(in string file)
-        {
-            string path = $"{ASSET_DIRECTORY_PACKAGE}/{file}";
-            if(File.Exists(path) == false) path = $"{ASSET_DIRECTORY_LOCAL}/{file}";
-            if (File.Exists(path) == false)
-            {
-                Debug.LogError($"{path}\n必要なアセットが見つかりません。拡張機能を導入しなおしてください。");
-            }
-            return path;
-        }
 
         public delegate T ConvertFunc<T>(string s);
 
@@ -38,8 +23,9 @@ namespace ClusterWorldTools
             {
                 ret = convertFunc(value);
             }
-            catch
+            catch (System.Exception ex)
             {
+                Debug.LogWarning($"{key} の設定読み込みに失敗しました。デフォルト値を使用します。{ex.Message}");
                 ret = defaultValue;
             }
             return ret;

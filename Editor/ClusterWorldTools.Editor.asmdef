@@ -1,5 +1,5 @@
 {
-    "name": "Editor",
+    "name": "ClusterWorldTools.Editor",
     "rootNamespace": "",
     "references": [
         "ClusterVR.CreatorKit",
@@ -22,7 +22,10 @@
         "ClusterVR.CreatorKit.Item",
         "ClusterVR.CreatorKit.Item.Implements",
         "ClusterVR.CreatorKit.Constants",
-        "Unity.Postprocessing.Runtime"
+        "Unity.Postprocessing.Runtime",
+        "ClusterVR.CreatorKit.Editor.EditorEvents",
+        "ClusterVR.CreatorKit.Gimmick.Supplements",
+        ""
     ],
     "includePlatforms": [
         "Editor"

@@ -15,7 +15,7 @@ using UnityEngine.UI;
 using UnityEngine.Assertions.Must;
 using UnityEditor.SceneManagement;
 
-namespace ClusterWorldTools
+namespace ClusterWorldTools.Editor.Tool
 {
     public class KeySearch : EditorWindow
     {
@@ -153,7 +153,6 @@ namespace ClusterWorldTools
 
                 var buttonStyle = new GUIStyle(EditorStyles.miniButton);
                 buttonStyle.alignment = TextAnchor.MiddleLeft;
-                //buttonStyle.stretchHeight = true;
                 buttonStyle.fixedHeight = 0f;
 
                 using (var scope = new EditorGUILayout.VerticalScope(GUILayout.Width(labelStyle.fixedWidth)))
@@ -211,7 +210,7 @@ namespace ClusterWorldTools
                                 {
                                     case GimmickTarget.Item:
                                         targetQuery = Target.Item;
-                                        var allItems = FindObjectsOfType<Item>();
+                                        var allItems = FindObjectsByType<Item>(FindObjectsInactive.Include, FindObjectsSortMode.None);
                                         foreach (var item in allItems)
                                         {
                                             if (item.Id.Value == 0L) item.Id = ItemId.Create();
@@ -278,7 +277,7 @@ namespace ClusterWorldTools
 
         void FindKey()
         {
-            var allGameObjects = FindObjectsOfType<GameObject>();
+            var allGameObjects = FindObjectsByType<GameObject>(FindObjectsInactive.Include, FindObjectsSortMode.None);
             var triggers = allGameObjects.Where(trigger => trigger.GetComponent<ITrigger>() != null);
             var gimmicks = allGameObjects.Where(gimmick => gimmick.GetComponent<IGimmick>() != null);
             var logics = allGameObjects.Where(logic => logic.GetComponent<ILogic>() != null);

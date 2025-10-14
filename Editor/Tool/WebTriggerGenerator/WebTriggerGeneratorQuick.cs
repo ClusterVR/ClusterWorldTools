@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEditor;
 
-namespace ClusterWorldTools
+namespace ClusterWorldTools.Editor.Tool.WebTriggerGenerator
 {
 
     public class WebTriggerGeneratorQuick: WebTriggerGenerator
@@ -35,7 +35,7 @@ namespace ClusterWorldTools
                     {
                         keys = new List<Key>();
 
-                        var gimmicks = FindObjectsOfType<GameObject>(true);
+                        var gimmicks = FindObjectsByType<GameObject>(FindObjectsInactive.Include, FindObjectsSortMode.None);
                         foreach (var gimmick in gimmicks)
                         {
                             var gimmickComponents = gimmick.GetComponents<ClusterVR.CreatorKit.Gimmick.IGimmick>();
@@ -96,28 +96,28 @@ namespace ClusterWorldTools
         void GenerateOnOffTrigger(string name, string key)
         {
             List<State> s = new List<State>();
-            State activate = new State(key, ClusterVR.CreatorKit.ParameterType.Bool);
+            State activate = new State() { key = key, type = "bool" };
             activate.value = "true";
             s.Add(activate);
             trigger.category = name;
             trigger.displayName = key + "_ON";
-            triggerList.triggers.Add(new TriggerJSON(trigger, s));
+            triggerList.triggers.Add(new Trigger(trigger) { state = s });
 
-            State deactive = new State(key, ClusterVR.CreatorKit.ParameterType.Bool);
+            State deactive = new State() { key = key, type = "bool" };
             deactive.value = "false";
             s[0] = deactive;
             trigger.displayName = key + "_OFF";
-            triggerList.triggers.Add(new TriggerJSON(trigger, s));
+            triggerList.triggers.Add(new Trigger(trigger) { state = s });
         }
 
         void GenerateSignalTrigger(string name, string key)
         {
             List<State> s = new List<State>();
-            State activate = new State(key, ClusterVR.CreatorKit.ParameterType.Signal);
+            State activate = new State() { key = key, type = "signal" };
             s.Add(activate);
             trigger.category = name;
             trigger.displayName = key + "_Signal";
-            triggerList.triggers.Add(new TriggerJSON(trigger, s));
+            triggerList.triggers.Add(new Trigger(trigger) { state = s });
         }
     }
 }

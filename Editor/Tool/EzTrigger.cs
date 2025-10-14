@@ -8,9 +8,9 @@ using ClusterVR.CreatorKit.Editor.Preview;
 using ClusterVR.CreatorKit.Editor.Preview.RoomState;
 using System;
 
-namespace ClusterWorldTools
+namespace ClusterWorldTools.Editor.Tool
 {
-    public class EzTriggerWindow : EditorWindow
+    public class EzTrigger : EditorWindow
     {
         private const string TOOL_NAME = "トリガー発行";
         private List<IGimmick> gimmicks = new List<IGimmick>();
@@ -22,7 +22,7 @@ namespace ClusterWorldTools
         [MenuItem("WorldTools/" + TOOL_NAME)]
         static public void CreateWindow()
         {
-            GetWindow<EzTriggerWindow>(TOOL_NAME);
+            GetWindow<EzTrigger>(TOOL_NAME);
         }
         private void OnEnable()
         {
@@ -175,10 +175,10 @@ namespace ClusterWorldTools
         }
         private void OnSelectionChanged()
         {
-            var objs = Resources.FindObjectsOfTypeAll(typeof(EzTriggerWindow));
+            var objs = Resources.FindObjectsOfTypeAll(typeof(EzTrigger));
             if (objs.Length == 0) return;
 
-            var window = (EzTriggerWindow)objs[0];
+            var window = (EzTrigger)objs[0];
             window.UpdateTriggers();
             window.Repaint();
         }

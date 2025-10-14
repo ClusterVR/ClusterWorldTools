@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
-namespace ClusterWorldTools
+namespace ClusterWorldTools.Editor.Tool
 {
     public class LayerSetUp : EditorWindow
     {
         static readonly Dictionary<int, string> LAYERNAMES = new Dictionary<int, string>
         {
             { 6,  "Accessory" },
-            { 7,  "AccessoryPreview" },
+            { 7,  "CameraOnly" },
             { 9,  "FIRSTPERSON_ONLY_LAYER" },
             { 10, "THIRDPERSON_ONLY_LAYER"},
             { 11, "RidingItem" },

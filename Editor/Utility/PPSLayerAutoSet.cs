@@ -1,16 +1,13 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using UnityEditor;
 using UnityEngine;
-using UnityEditor;
 using UnityEngine.Rendering.PostProcessing;
-using System.Linq;
 using UnityEngine.SceneManagement;
 using UnityEditor.SceneManagement;
-using System;
+using ClusterWorldTools.Editor.Common;
 
-namespace ClusterWorldTools
+namespace ClusterWorldTools.Editor.Utility
 {
-    class PPSLayerAutoSet : Editor
+    class PPSLayerAutoSet
     {
         const int POST_PROCESSING_LAYER = 21;
 
@@ -36,10 +33,14 @@ namespace ClusterWorldTools
                 changedList.Initialize<PostProcessVolume>();
             }
 
-            var postProcesses = FindObjectsOfType<PostProcessVolume>(true);
+            var postProcesses = UnityEngine.Object.FindObjectsByType<PostProcessVolume>(FindObjectsInactive.Include, FindObjectsSortMode.None);
             foreach (var pps in postProcesses)
             {
-                if(changedList.CheckAndAdd(pps.gameObject) == false)pps.gameObject.layer = POST_PROCESSING_LAYER;
+                if (changedList.CheckAndAdd(pps.gameObject) == false)
+                {
+                    Undo.RecordObject(pps.gameObject, "Set Post-Processing Layer");
+                    pps.gameObject.layer = POST_PROCESSING_LAYER;
+                }
             }
             changedList.RemoveDeletedMembers();
         }
