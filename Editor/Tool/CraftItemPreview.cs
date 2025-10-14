@@ -1,6 +1,7 @@
 ﻿using ClusterVR.CreatorKit.Editor.ItemExporter;
 using System;
 using System.Linq;
+using ClusterWorldTools.Editor.Common;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -9,7 +10,7 @@ using UnityEngine.Rendering;
 using UnityEngine.Rendering.PostProcessing;
 using UnityEngine.SceneManagement;
 
-namespace ClusterWorldTools
+namespace ClusterWorldTools.Editor.Tool
 {
     public class CraftItemPreviewScene : IDisposable
     {
@@ -67,18 +68,21 @@ namespace ClusterWorldTools
                 RenderSettings.ambientEquatorColor = ambientEquatorColor;
                 RenderSettings.ambientGroundColor = ambientGroundColor;
                 RenderSettings.defaultReflectionMode = reflectionMode;
-                RenderSettings.customReflection = reflection;
+                if (reflection != null)
+                {
+                    RenderSettings.customReflectionTexture = reflection;
+                }
             }
 
             public static EnvironmentSettings GetCurrentSettings()
             {
-                return new EnvironmentSettings(RenderSettings.ambientMode, RenderSettings.ambientSkyColor, RenderSettings.ambientEquatorColor, RenderSettings.ambientGroundColor, RenderSettings.defaultReflectionMode, RenderSettings.customReflection as Cubemap);
+                return new EnvironmentSettings(RenderSettings.ambientMode, RenderSettings.ambientSkyColor, RenderSettings.ambientEquatorColor, RenderSettings.ambientGroundColor, RenderSettings.defaultReflectionMode, RenderSettings.customReflectionTexture as Cubemap);
             }
         }
 
         // 青空の背景の環境光
         EnvironmentSettings previewEnvironment = new EnvironmentSettings(AmbientMode.Trilight, new Color(0.736f, 0.768f, 0.8f), new Color(0.5992157f, 0.6612035f, 0.7490196f), new Color(0.04588235f, 0.04806723f, 0.05098039f), DefaultReflectionMode.Custom, CreateSingleColorCubeMap(4, new Color(0.454902f, 0.7254902f, 0.9607844f)));
-        
+
         private static Cubemap CreateSingleColorCubeMap(int size, Color color)
         {
             var texture = new Cubemap(size, DefaultFormat.LDR, TextureCreationFlags.None);
@@ -193,7 +197,7 @@ namespace ClusterWorldTools
 
         private PostProcessProfile LoadPPSProfile(in string assetPath)
         {
-            var profile = AssetDatabase.LoadAssetAtPath<PostProcessProfile>(Common.AssetPath($"{PPS_ASSET_DIRECTORY}/{assetPath}"));
+            var profile = AssetDatabase.LoadAssetAtPath<PostProcessProfile>(ResourceUtil.AssetPath($"{PPS_ASSET_DIRECTORY}/{assetPath}"));
             if(profile == null)
             {
                 Debug.LogError("必要なアセットが見つかりません。拡張機能を導入しなおしてください。");
@@ -251,14 +255,31 @@ namespace ClusterWorldTools
             window.titleContent = new GUIContent("クラフトアイテムプレビュー");
         }
 
+        void OnEnable()
+        {
+            EditorApplication.projectChanged += OnProjectChanged;
+        }
+
         public void OnDisable()
         {
+            EditorApplication.projectChanged -= OnProjectChanged;
             if(scene != null)scene.Dispose();
+        }
+
+        void OnProjectChanged()
+        {
+            if (item != null && EditorUtility.IsPersistent(item))
+            {
+                Repaint();
+            }
         }
 
         private void Update()
         {
-            Repaint();
+            if (item != item_before)
+            {
+                Repaint();
+            }
         }
 
         private void OnGUI()

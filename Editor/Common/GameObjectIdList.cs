@@ -5,7 +5,7 @@ using UnityEditor;
 using UnityEngine.Rendering.PostProcessing;
 using System.Linq;
 
-namespace ClusterWorldTools
+namespace ClusterWorldTools.Editor.Common
 {
     class GameObjectIdList
     {
@@ -13,7 +13,7 @@ namespace ClusterWorldTools
 
         public void Initialize<T>() where T : Component
         {
-            list = GameObject.FindObjectsOfType<T>().Select(o => o.gameObject.GetInstanceID()).ToList();
+            list = GameObject.FindObjectsByType<T>(FindObjectsInactive.Include, FindObjectsSortMode.None).Select(o => o.gameObject.GetInstanceID()).ToList();
         }
 
         public bool CheckAndAdd(GameObject gameObject)

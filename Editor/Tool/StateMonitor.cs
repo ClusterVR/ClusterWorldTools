@@ -10,16 +10,37 @@ using ClusterVR.CreatorKit.Item;
 using System.Linq;
 using UnityEngine.SceneManagement;
 
-namespace ClusterWorldTools
+namespace ClusterWorldTools.Editor.Tool
 {
     public class StateMonitor : EditorWindow
     {
+        static FieldInfo cachedValuesField;
+        static FieldInfo ValuesField => cachedValuesField ??= Bootstrap.RoomStateRepository?.GetType()
+            .GetField("values", BindingFlags.NonPublic | BindingFlags.Instance);
+
         RoomStateRepository roomStateRepository;
         Dictionary<string, StateValue> values;
         string searchText = "";
         [SerializeField] GameObject searchItem;
 
         Vector2 scrollPosition;
+
+        Dictionary<string, StateValue> GetStateValues()
+        {
+            try
+            {
+                var field = ValuesField;
+                if (field == null || Bootstrap.RoomStateRepository == null)
+                    return null;
+
+                return field.GetValue(Bootstrap.RoomStateRepository) as Dictionary<string, StateValue>;
+            }
+            catch (System.Exception ex)
+            {
+                Debug.LogWarning($"Stateの取得に失敗しました。{ex.Message}");
+                return null;
+            }
+        }
 
         [MenuItem("WorldTools/トリガーモニター")]
         static public void CreateWindow()
@@ -30,7 +51,10 @@ namespace ClusterWorldTools
 
         private void Update()
         {
-            Repaint();
+            if (EditorApplication.isPlaying)
+            {
+                Repaint();
+            }
         }
 
         private void OnGUI()
@@ -56,14 +80,17 @@ namespace ClusterWorldTools
             EditorGUILayout.LabelField("トリガーの内容を表示します。");
             if (roomStateRepository != Bootstrap.RoomStateRepository)
             {
-                var field = Bootstrap.RoomStateRepository.GetType().GetField("values", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.GetField);
-                values = (Dictionary<string, StateValue>)field.GetValue(Bootstrap.RoomStateRepository);
+                values = GetStateValues();
                 if (values != null)
                 {
                     roomStateRepository = Bootstrap.RoomStateRepository;
                 }
             }
-            if (values == null) return;
+            if (values == null)
+            {
+                EditorGUILayout.LabelField("トリガーの情報を取得できませんでした。");
+                return;
+            }
 
             var rootGameObjects = SceneManager.GetActiveScene().GetRootGameObjects();
             var items = rootGameObjects.SelectMany(x => x.GetComponentsInChildren<IItem>(true)).ToDictionary(x => x.Id.Value);

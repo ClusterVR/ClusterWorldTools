@@ -13,12 +13,13 @@ using UnityEditor.VersionControl;
 using ClusterVR.CreatorKit.World;
 using ClusterVR.CreatorKit.Editor.Preview.World;
 using System;
+using ClusterWorldTools.Editor.Common;
 using UnityEditor.Experimental.GraphView;
 using Google.Protobuf.WellKnownTypes;
 
-namespace ClusterWorldTools
+namespace ClusterWorldTools.Editor.Utility
 {
-    class ValidatorWindow : EditorWindow
+    class Validator : EditorWindow
     {
         ValidatorManager validatorManager = new ValidatorManager();
         List<IAutoFix> autoFixes = new List<IAutoFix>();
@@ -28,7 +29,7 @@ namespace ClusterWorldTools
         [MenuItem("WorldTools/改善チェック")]
         static public void CreateWindow()
         {
-            EditorWindow window = GetWindow<ValidatorWindow>();
+            EditorWindow window = GetWindow<Validator>();
             window.titleContent = new GUIContent("改善チェック");
         }
 
@@ -153,7 +154,7 @@ namespace ClusterWorldTools
                     if (type.IsGenericType) continue;
                     if (type.IsAbstract) continue;
                     if (typeof(IValidator).IsAssignableFrom(type) == false) continue;
-                    validators.Add(type, new ValidatorEnable(type, Common.LoadSetting($"{SETTINGS_KEY_PREFIX}{type.Name}", true, System.Convert.ToBoolean)));
+                    validators.Add(type, new ValidatorEnable(type, EditorSettingUtil.LoadSetting($"{SETTINGS_KEY_PREFIX}{type.Name}", true, System.Convert.ToBoolean)));
                 }
             }
         }
@@ -162,7 +163,7 @@ namespace ClusterWorldTools
         {
             foreach(var validator in validators)
             {
-                Common.SaveSetting($"{SETTINGS_KEY_PREFIX}{validator.Key.Name}", validator.Value.isEnabled);
+                EditorSettingUtil.SaveSetting($"{SETTINGS_KEY_PREFIX}{validator.Key.Name}", validator.Value.isEnabled);
             }
         }
 
@@ -203,7 +204,7 @@ namespace ClusterWorldTools
 
         public static IEnumerable<T> FindGameObjectsAndPrefabs<T>(FindQueryFunc<T> func) where T : UnityEngine.Object
         {
-            var gameObjects = UnityEngine.Object.FindObjectsOfType<T>(true).Where(x => func(x));
+            var gameObjects = UnityEngine.Object.FindObjectsByType<T>(FindObjectsInactive.Include, FindObjectsSortMode.None).Where(x => func(x));
             var prefabs = AssetDatabase.FindAssets("t:GameObject", null).Select(path => AssetDatabase.LoadAssetAtPath<T>(AssetDatabase.GUIDToAssetPath(path))).Where(prefab => prefab != null && func(prefab));
 
             var ret = new List<T>();
@@ -222,8 +223,7 @@ namespace ClusterWorldTools
 
     class UnityVersionValidator : IValidator
     {
-        // Unityバージョン
-        const string CLUSTER_UNITY_VERSION = "2021.3.4f1";
+        const string CLUSTER_UNITY_VERSION = "6000.2.0f1";
 
         bool IValidator.Validate()
         {
@@ -283,12 +283,11 @@ namespace ClusterWorldTools
 
     class RealtimeLightValidator : IValidator
     {
-        // リアルタイムライトの最大数
         const int MAX_NUMBER_OF_REALTIME_LIGHTS = 2;
 
         bool IValidator.Validate()
         {
-            var lights = UnityEngine.Object.FindObjectsOfType<Light>(true).Where(light => light.lightmapBakeType != LightmapBakeType.Baked);
+            var lights = UnityEngine.Object.FindObjectsByType<Light>(FindObjectsInactive.Include, FindObjectsSortMode.None).Where(light => light.lightmapBakeType != LightmapBakeType.Baked);
 
             if (lights.Count() > MAX_NUMBER_OF_REALTIME_LIGHTS)
             {
@@ -310,7 +309,6 @@ namespace ClusterWorldTools
 
     class TextureAssetValidator : IValidator
     {
-        // テクスチャの最大解像度
         const int MAX_TEXTURE_SIZE = 1024;
 
         bool IValidator.Validate()
@@ -351,7 +349,6 @@ namespace ClusterWorldTools
 #if UNITY_EDITOR_WIN
     class FilePathLengthValidator : IValidator
     {
-        // Windowsのディレクトリ名の長さの最大
         const int MAX_DIRECTORY_NAME_LENGTH_WIN = 260;
 
         bool IValidator.Validate()
@@ -453,7 +450,7 @@ namespace ClusterWorldTools
         // 既存コライダのBoundsの一番低い位置の1m下に作成（コライダが一つもない場合は-5mの位置）
         void IAutoFix.Fix()
         {
-            var colliders = UnityEngine.Object.FindObjectsOfType<Collider>(true);
+            var colliders = UnityEngine.Object.FindObjectsByType<Collider>(FindObjectsInactive.Include, FindObjectsSortMode.None);
             float height = float.MaxValue;
             if (colliders.Length > 0)
             {
@@ -484,7 +481,7 @@ namespace ClusterWorldTools
             var despawnHeight = UnityEngine.Object.FindObjectOfType<DespawnHeight>(true);
             if (despawnHeight == null) return true;
 
-            var colliders = UnityEngine.Object.FindObjectsOfType<Collider>(true);
+            var colliders = UnityEngine.Object.FindObjectsByType<Collider>(FindObjectsInactive.Include, FindObjectsSortMode.None);
             bool result = true;
             foreach (var collider in colliders)
             {
@@ -508,7 +505,7 @@ namespace ClusterWorldTools
     {
         bool IValidator.Validate()
         {
-            var despawnHeights = UnityEngine.Object.FindObjectsOfType<DespawnHeight>();
+            var despawnHeights = UnityEngine.Object.FindObjectsByType<DespawnHeight>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
             if (despawnHeights.Length > 1)
             {
                 foreach (var despawnHeight in despawnHeights)
@@ -592,7 +589,7 @@ namespace ClusterWorldTools
 
         bool IValidator.Validate()
         {
-            lights = UnityEngine.Object.FindObjectsOfType<Light>(true).Where(light =>
+            lights = UnityEngine.Object.FindObjectsByType<Light>(FindObjectsInactive.Include, FindObjectsSortMode.None).Where(light =>
             {
                 var avatarLayerMask = light.cullingMask & allAvatarLayerMask;
                 return !((avatarLayerMask == allAvatarLayerMask) || (avatarLayerMask == 0));
@@ -649,7 +646,6 @@ namespace ClusterWorldTools
 
     class WorldGateIdValidator : IValidator
     {
-        // World IDの正規表現
         const string WORLD_ID_REGEX = "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$";
         Regex worldIdRegex = new Regex(WORLD_ID_REGEX, RegexOptions.Compiled);
 

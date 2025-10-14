@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
+using ClusterWorldTools.Editor.Common;
+using Utils = UnityEngine.TestTools.Utils.Utils;
 
-namespace ClusterWorldTools
+namespace ClusterWorldTools.Editor.Utility
 {
     public class CreateCCKRequired : MonoBehaviour
     {
@@ -27,7 +29,7 @@ namespace ClusterWorldTools
         [MenuItem(GAMEOBJECT_MENU_ITEM + "MainScreen")]
         public static void CreateMainScreen()
         {
-            InstantiatePrefab("StandardMainScreen", Common.AssetPath(SCREEN_PREFAB_PATH));
+            InstantiatePrefab("StandardMainScreen", ResourceUtil.AssetPath(SCREEN_PREFAB_PATH));
         }
 
         [MenuItem(GAMEOBJECT_MENU_ITEM + "Speed and Jump")]
@@ -38,7 +40,7 @@ namespace ClusterWorldTools
             {
                 if (EditorUtility.DisplayDialog("確認", "Set Move Speed Rate Player GimmickまたはSet Jump Height Rate Player Gimmickがすでに存在します。新規作成しますか？", "Yes", "No") == false) return;
             }
-            InstantiatePrefab("Speed and Jump", Common.AssetPath(SPEED_JUMP_PREFAB_PATH));
+            InstantiatePrefab("Speed and Jump", ResourceUtil.AssetPath(SPEED_JUMP_PREFAB_PATH));
         }
         
         private static GameObject CreateObjectHasSingleComponent<T>(in string name) where T : Component
