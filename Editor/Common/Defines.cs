@@ -7,7 +7,8 @@ namespace ClusterWorldTools.Editor.Common
     [InitializeOnLoad]
     static class Defines
     {
-        const string ClusterWorldToolsSymbol = "CLUSTER_WORLD_TOOLS";
+        const string ClusterWorldToolsSymbol_OLD = "CLUSTER_WORLD_TOOLS";
+        const string ClusterWorldToolsSymbol = "ClusterWorldTools";
 
         static Defines()
         {
@@ -20,6 +21,11 @@ namespace ClusterWorldTools.Editor.Common
             var defines = PlayerSettings.GetScriptingDefineSymbolsForGroup(targetGroup);
 
             var symbols = (string.IsNullOrEmpty(defines) ? Array.Empty<string>() : defines.Split(';')).ToList();
+
+            if (symbols.Any(symbol => symbol.Trim() == ClusterWorldToolsSymbol_OLD))
+            {
+                symbols.Remove(ClusterWorldToolsSymbol_OLD);
+            }
 
             if (symbols.Any(symbol => symbol.Trim() == ClusterWorldToolsSymbol))
                 return;
