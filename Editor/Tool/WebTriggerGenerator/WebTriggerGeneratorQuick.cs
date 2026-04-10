@@ -95,19 +95,20 @@ namespace ClusterWorldTools.Editor.Tool.WebTriggerGenerator
 
         void GenerateOnOffTrigger(string name, string key)
         {
-            List<State> s = new List<State>();
+            List<State> onState = new List<State>();
             State activate = new State() { key = key, type = "bool" };
             activate.value = "true";
-            s.Add(activate);
+            onState.Add(activate);
             trigger.category = name;
             trigger.displayName = key + "_ON";
-            triggerList.triggers.Add(new Trigger(trigger) { state = s });
+            triggerList.triggers.Add(new Trigger(trigger) { state = onState });
 
+            List<State> offState = new List<State>();
             State deactive = new State() { key = key, type = "bool" };
             deactive.value = "false";
-            s[0] = deactive;
+            offState.Add(deactive);
             trigger.displayName = key + "_OFF";
-            triggerList.triggers.Add(new Trigger(trigger) { state = s });
+            triggerList.triggers.Add(new Trigger(trigger) { state = offState });
         }
 
         void GenerateSignalTrigger(string name, string key)
